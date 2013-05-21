@@ -11,8 +11,11 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <time.h>
+#include <math.h>
 
 #define	MAXVLEN	1000000
+#define TESTFILE "dados5000.txt"
+#define VECTORLEN 5000
 
 
 
@@ -22,7 +25,7 @@
 typedef struct
 {
 	int n_comp;
-	float t_exec;
+	clock_t t_exec;
 } Performance;
 
 
@@ -47,9 +50,9 @@ Performance quick_sort(int *V, int p, int r, Performance (*partition)(int *q, in
 
 Performance merge_sort(int *V, int p, int r);
 
-Performance k_smallest(int *V, int n);
+Performance k_smallest(int *q, int *V, int n, int k);
 
-int *read_vector(int n);
+int *read_vector(FILE *file, int n);
 int random_index(int p, int r);
 void swap(int *V, int a, int b);
 
@@ -58,39 +61,188 @@ void swap(int *V, int a, int b);
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * Main
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+int frequency_of_primes (int n) {
+  int i, j, q;
+  int freq=n-1;
+  for (i=2; i<=n; ++i) for (j=sqrt(i);j>1;--j) if (i%j==0) {--freq; break;}
+  return freq;
+}
+
 int main()
 {
-	int i, n, *V, q;
-	Performance out;
+	int i, j, m, n, *V, q;
+	FILE *file;
+	Performance partial[100], mean;
 /*
-	if (!scanf(" %d", &n)) {
-		puts("Erro ao ler o tamanho do vetor.");
+	file = fopen(TESTFILE, "r");
+	n = VECTORLEN;
+	if (!fscanf(file, " %d", &m)) {
+		puts("Erro ao ler o numero de vetores.");
 		exit(1);
+	} else {
+		for (i = 0; i < m; i++) {
+			V = read_vector(file, n);
+			partial[i] = bubble_sort(V,n);
+			free(V);
+		}
+		mean.n_comp = 0;
+		mean.t_exec = 0;
+		for (i = 0; i < m; i++) {
+			mean.n_comp += partial[i].n_comp;
+			mean.t_exec += partial[i].t_exec;
+		}
+		mean.n_comp = mean.n_comp / 100;
+		mean.t_exec = mean.t_exec / 100;
+		printf("bubbleSort %f número_medio_de_comparações %f tempo_médio_de_execução\n", (double) mean.n_comp, (double)mean.t_exec / CLOCKS_PER_SEC);
 	}
-	else
-		V = read_vector(n);
+	fclose(file);
+
+	file = fopen(TESTFILE, "r");
+	n = VECTORLEN;
+	if (!fscanf(file, " %d", &m)) {
+		puts("Erro ao ler o numero de vetores.");
+		exit(1);
+	} else {
+		for (i = 0; i < m; i++) {
+			V = read_vector(file, n);
+			partial[i] = insertion_sort(V,n);
+			free(V);
+		}
+		mean.n_comp = 0;
+		mean.t_exec = 0;
+		for (i = 0; i < m; i++) {
+			mean.n_comp += partial[i].n_comp;
+			mean.t_exec += partial[i].t_exec;
+		}
+		mean.n_comp = mean.n_comp / 100;
+		mean.t_exec = mean.t_exec / 100;
+		printf("insertionSort %f número_medio_de_comparações %f tempo_médio_de_execução\n", (double) mean.n_comp, (double)mean.t_exec / CLOCKS_PER_SEC);
+	}
+	fclose(file);
+
+	file = fopen(TESTFILE, "r");
+	n = VECTORLEN;
+	if (!fscanf(file, " %d", &m)) {
+		puts("Erro ao ler o numero de vetores.");
+		exit(1);
+	} else {
+		for (i = 0; i < m; i++) {
+			V = read_vector(file, n);
+			partial[i] = selection_sort(V,n);
+			free(V);
+		}
+		mean.n_comp = 0;
+		mean.t_exec = 0;
+		for (i = 0; i < m; i++) {
+			mean.n_comp += partial[i].n_comp;
+			mean.t_exec += partial[i].t_exec;
+		}
+		mean.n_comp = mean.n_comp / 100;
+		mean.t_exec = mean.t_exec / 100;
+		printf("selectionSort %f número_medio_de_comparações %f tempo_médio_de_execução\n", (double) mean.n_comp, (double)mean.t_exec / CLOCKS_PER_SEC);
+	}
+	fclose(file);
+
+	file = fopen(TESTFILE, "r");
+	n = VECTORLEN;
+	if (!fscanf(file, " %d", &m)) {
+		puts("Erro ao ler o numero de vetores.");
+		exit(1);
+	} else {
+		for (i = 0; i < m; i++) {
+			V = read_vector(file, n);
+			partial[i] = merge_sort(V,0,n-1);
+			free(V);
+		}
+		mean.n_comp = 0;
+		mean.t_exec = 0;
+		for (i = 0; i < m; i++) {
+			mean.n_comp += partial[i].n_comp;
+			mean.t_exec += partial[i].t_exec;
+		}
+		mean.n_comp = mean.n_comp / 100;
+		mean.t_exec = mean.t_exec / 100;
+		printf("mergeSort %f número_medio_de_comparações %f tempo_médio_de_execução\n", (double) mean.n_comp, (double)mean.t_exec / CLOCKS_PER_SEC);
+	}
+	fclose(file);
+
+	file = fopen(TESTFILE, "r");
+	n = VECTORLEN;
+	if (!fscanf(file, " %d", &m)) {
+		puts("Erro ao ler o numero de vetores.");
+		exit(1);
+	} else {
+		for (i = 0; i < m; i++) {
+			V = read_vector(file, n);
+			partial[i] = quick_sort(V, 0, n-1, partition);
+			free(V);
+		}
+		mean.n_comp = 0;
+		mean.t_exec = 0;
+		for (i = 0; i < m; i++) {
+			mean.n_comp += partial[i].n_comp;
+			mean.t_exec += partial[i].t_exec;
+		}
+		mean.n_comp = mean.n_comp / 100;
+		mean.t_exec = mean.t_exec / 100;
+		printf("quickSort1 %f número_medio_de_comparações %f tempo_médio_de_execução\n", (double) mean.n_comp, (double)mean.t_exec / CLOCKS_PER_SEC);
+	}
+	fclose(file);
+
+	file = fopen(TESTFILE, "r");
+	n = VECTORLEN;
+	if (!fscanf(file, " %d", &m)) {
+		puts("Erro ao ler o numero de vetores.");
+		exit(1);
+	} else {
+		for (i = 0; i < m; i++) {
+			V = read_vector(file, n);
+			partial[i] = quick_sort(V, 0, n-1, randomized_partition);
+			free(V);
+		}
+		mean.n_comp = 0;
+		mean.t_exec = 0;
+		for (i = 0; i < m; i++) {
+			mean.n_comp += partial[i].n_comp;
+			mean.t_exec += partial[i].t_exec;
+		}
+		mean.n_comp = mean.n_comp / 100;
+		mean.t_exec = mean.t_exec / 100;
+		printf("quickSort2 %f número_medio_de_comparações %f tempo_médio_de_execução\n", (double) mean.n_comp, (double)mean.t_exec / CLOCKS_PER_SEC);
+	}
+	fclose(file);
 */
-	V = (int *) calloc(10, sizeof(int));
 
-	V[0]=34;
-	V[1]=75;
-	V[2]=37;
-	V[3]=97;
-	V[4]=25;
-	V[5]=72;
-	V[6]=44;
-	V[7]=83;
-	V[8]=43;
-	V[9]=12;
+	file = fopen(TESTFILE, "r");
+	n = VECTORLEN;
+	if (!fscanf(file, " %d", &m)) {
+		puts("Erro ao ler o numero de vetores.");
+		exit(1);
+	} else {
+		for (i = 0; i < m; i++) {
+			V = read_vector(file, n);
+			partial[i] = k_smallest(&q, V, n, n/2);
+			free(V);
+		}
+		mean.n_comp = 0;
+		mean.t_exec = 0;
+		for (i = 0; i < m; i++) {
+			mean.n_comp += partial[i].n_comp;
+			mean.t_exec += partial[i].t_exec;
+		}
+		mean.n_comp = mean.n_comp / 100;
+		mean.t_exec = mean.t_exec / 100;
+		printf("kSmallest %f número_medio_de_comparações %f tempo_médio_de_execução\n", (double) mean.n_comp, (double)mean.t_exec / CLOCKS_PER_SEC);
+	}
+	fclose(file);
 
-	out = quick_sort(V, 0, 9, randomized_partition);
+	//out = insertion_sort(V,n);
+	//out = selection_sort(V,n);
+	//out = bubble_sort(V,n);
 
-	printf("Foram feitas %d comparações para ordenar o vetor.\n", out.n_comp);
-	for (i = 0; i < 10; i++)
-		printf("%d ", V[i]);
-	puts("");
+	//out = quick_sort(V, 0, n-1, randomized_partition);
 
-	free(V);
+	//out = merge_sort(V,0,n-1);
 
 
 	return 0;
@@ -106,6 +258,7 @@ Performance insertion_sort(int *V, int n)
 	int i, j, aux;
 	Performance out = {0,0};
 
+	out.t_exec = clock();
 	for (j = 1; j < n; j++) {
 		i = j;
 		while ((i > 0) && (V[i-1] > V[i])) {
@@ -114,6 +267,7 @@ Performance insertion_sort(int *V, int n)
 			i--;
 		}
 	}
+	out.t_exec = clock() - out.t_exec;
 
 	return out;
 }
@@ -128,6 +282,7 @@ Performance selection_sort(int *V, int n)
 	int i, j, m, aux;
 	Performance out = {0,0};
 
+	out.t_exec = clock();
 	for (j = 0; j <= n; j++) {
 		m = j;
 		for (i = j+1; i < n; i++)
@@ -140,6 +295,7 @@ Performance selection_sort(int *V, int n)
 			swap(V, j, m);
 		}
 	}
+	out.t_exec = clock() - out.t_exec;
 
 	return out;
 }
@@ -154,6 +310,7 @@ Performance bubble_sort(int *V, int n)
 	int i, j;
 	Performance out = {0,0};
 
+	out.t_exec = clock();
 	do {
 		j = 0;
 		for (i = 1; i < n; i++) {
@@ -165,6 +322,7 @@ Performance bubble_sort(int *V, int n)
 		}
 		n = j;
 	} while (n);
+	out.t_exec = clock() - out.t_exec;
 
 	return out;
 }
@@ -179,7 +337,7 @@ Performance partition(int *q, int *V, int p, int r)
 	int i, j, tmp;
 	Performance out = {0,0};
 
-	tmp = V[p];
+	tmp = V[r];
 	i = p - 1;
 	for (j = p; j < r; j++)
 		if (V[j] <= tmp) {
@@ -208,19 +366,18 @@ Performance quick_sort(int *V, int p, int r, Performance (*part_func)(int *q, in
 	int q;
 	Performance tmp, out = {0,0};
 
+	out.t_exec = clock();
 	if (p < r) {
 		tmp = (*part_func)(&q, V, p, r);
 		out.n_comp += tmp.n_comp;
-		out.t_exec += tmp.t_exec;
 
 		tmp = quick_sort(V, p, q-1, part_func);
 		out.n_comp += tmp.n_comp;
-		out.t_exec += tmp.t_exec;
 
 		tmp = quick_sort(V, q+1, r, part_func);
 		out.n_comp += tmp.n_comp;
-		out.t_exec += tmp.t_exec;
 	}
+	out.t_exec = clock() - out.t_exec;
 
 	return out;
 }
@@ -272,20 +429,19 @@ Performance merge_sort(int *V, int p, int r)
 	int q;
 	Performance tmp, out = {0,0};
 
+	out.t_exec = clock();
 	if (p < r) {
 		q = (p+r)/2;
 		tmp = merge_sort(V, p, q);
 		out.n_comp += tmp.n_comp;
-		out.t_exec += tmp.t_exec;
 
 		tmp = merge_sort(V, q+1, r);
 		out.n_comp += tmp.n_comp;
-		out.t_exec += tmp.t_exec;
 
 		tmp = merge(V, p, q, r);
 		out.n_comp += tmp.n_comp;
-		out.t_exec += tmp.t_exec;
 	}
+	out.t_exec = clock() - out.t_exec;
 
 	return out;
 }
@@ -297,17 +453,55 @@ Performance merge_sort(int *V, int p, int r)
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 
+Performance k_smallest(int *q, int *V, int n, int k)
+{
+	Performance tmp, out = {0,0};
+	int i, j, l;
+
+	int nsc = n / 5;
+	int  U[nsc][5], M[nsc];
+
+	if ( n <= 5 ) {
+		tmp = insertion_sort(V, n);
+		*q = V[n/2];
+	} else {
+		l = i = 0;
+		while (i < n) {
+			for (j = 0; j < 5; j++)
+				U[l][j] = V[i++];
+			tmp = insertion_sort(U[l++], 5);
+			out.n_comp += tmp.n_comp;
+		}
+		for (i = 0; i < nsc; i++) {
+			M[i] = U[i][2];
+		}
+
+		tmp = k_smallest(q, M, nsc, nsc/2);
+		out.n_comp += tmp.n_comp;
+
+		/*for ( l = 0; l < nsc; l++ ) {
+			for ( i = 0; i < 5; i++ ) {
+				printf(" %d",U[l][i]);
+			}
+			puts("");
+		}*/
+	}
+
+	return out;
+}
+
+
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * Helper Functions
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-int *read_vector(int n)
+int *read_vector(FILE *file, int n)
 {
 	int i, *V;
 
 	V = (int *) calloc(n, sizeof(int));
 	for(i = 0; i < n; i++)
-		if (!scanf(" %d", &V[i])) {
+		if (!fscanf(file, " %d", &V[i])) {
 			puts("Erro ao ler um elemento do vetor.");
 			free(V);
 			exit(1);
