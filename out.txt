@@ -1,6 +1,0 @@
-bubbleSort 6248656.000000 número_medio_de_comparações 0.087600 tempo_médio_de_execução
-insertionSort 6248656.000000 número_medio_de_comparações 0.048600 tempo_médio_de_execução
-selectionSort 40434.000000 número_medio_de_comparações 0.038200 tempo_médio_de_execução
-mergeSort 61808.000000 número_medio_de_comparações 0.004900 tempo_médio_de_execução
-quickSort1 35881.000000 número_medio_de_comparações 0.003200 tempo_médio_de_execução
-quickSort2 35723.000000 número_medio_de_comparações 0.007800 tempo_médio_de_execução
